@@ -1,103 +1,150 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { MonitoringStation } from '@/lib/types';
+import { LazyMapWrapper, LazyDetailsPanelWrapper } from '@/components/LazyComponents';
+import SelectionStatus from '@/components/SelectionStatus';
+import { PerformanceMonitor } from '@/components/PerformanceMonitor';
+import { useDesignSystemShowcase } from '@/components/DesignSystemShowcase';
+import { motion } from 'framer-motion';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [selectedStation, setSelectedStation] = useState<MonitoringStation | null>(null);
+  const [isMapLoading, setIsMapLoading] = useState(true);
+  const [isDetailsPanelLoading, setIsDetailsPanelLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+  // Initialize design system showcase
+  useDesignSystemShowcase();
+
+  // Handler function to manage station selection with additional logic
+  const handleStationSelect = (station: MonitoringStation | null) => {
+    // Show loading state when selecting a new station
+    if (station !== selectedStation) {
+      setIsDetailsPanelLoading(true);
+      
+      // Simulate some processing time for station data
+      setTimeout(() => {
+        setSelectedStation(station);
+        setIsDetailsPanelLoading(false);
+      }, 300);
+    } else {
+      setSelectedStation(station);
+    }
+    
+    // Optional: Add console logging for debugging
+    if (station) {
+      console.log('Selected station:', station.name, 'AQI:', station.aqi);
+    } else {
+      console.log('Station deselected');
+    }
+  };
+
+  // Keyboard support for clearing selection
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && selectedStation) {
+        handleStationSelect(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [selectedStation]);
+
+  return (
+    <div className="min-h-screen">
+      {/* Main Content Container */}
+      <div className="max-w-7xl mx-auto p-4 md:p-8">
+        {/* Header Section with staggered animation */}
+        <motion.div 
+          className="mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 32 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
+            className="font-[Poppins] font-bold text-4xl text-foreground mb-2"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+            Dashboard AirQu
+          </motion.h1>
+          
+          <div className="flex items-center gap-3">
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: 'easeOut', delay: 0.2 }}
+              className="text-lg text-muted"
+            >
+              Pantau kualitas udara secara real-time di Jakarta dan sekitarnya
+            </motion.p>
+            
+            {/* Live Data Indicator */}
+            <motion.div 
+              className="flex items-center gap-2"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, ease: 'easeOut', delay: 0.3 }}
+            >
+              <div className="w-2 h-2 bg-aqi-good rounded-full animate-pulse"></div>
+              <span className="text-sm text-muted">Live Data</span>
+            </motion.div>
+          </div>
+
+
+        </motion.div>
+
+        {/* Selection Status */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.5 }}
+        >
+          <SelectionStatus 
+            selectedStation={selectedStation} 
+            onClearSelection={() => handleStationSelect(null)} 
+          />
+        </motion.div>
+
+        {/* Two Column Grid Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+          {/* Map Section - Takes 75% width on xl screens with staggered animation */}
+          <motion.div
+            className="xl:col-span-3"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.6 }}
+          >
+            {/* Map Container - No colored background boxes */}
+            <div className="h-[600px] relative">
+              <LazyMapWrapper 
+                className="w-full h-full rounded-2xl shadow-soft overflow-hidden" 
+                onStationSelect={handleStationSelect}
+                selectedStation={selectedStation}
+                onLoadingChange={setIsMapLoading}
+              />
+            </div>
+          </motion.div>
+
+          {/* Details Panel - Takes 25% width on xl screens with delayed animation */}
+          <motion.div
+            className="xl:col-span-1"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: 'easeOut', delay: 0.8 }}
+          >
+            <LazyDetailsPanelWrapper 
+              selectedStation={selectedStation} 
+              isLoading={isDetailsPanelLoading}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </motion.div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+      
+      {/* Performance Monitor */}
+      <PerformanceMonitor />
     </div>
   );
 }
