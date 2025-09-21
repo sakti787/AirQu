@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MonitoringStation } from '@/lib/types';
 import { LazyMapWrapper, LazyDetailsPanelWrapper } from '@/components/LazyComponents';
 import SelectionStatus from '@/components/SelectionStatus';
@@ -10,14 +10,13 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   const [selectedStation, setSelectedStation] = useState<MonitoringStation | null>(null);
-  const [isMapLoading, setIsMapLoading] = useState(true);
   const [isDetailsPanelLoading, setIsDetailsPanelLoading] = useState(false);
 
   // Initialize design system showcase
   useDesignSystemShowcase();
 
   // Handler function to manage station selection with additional logic
-  const handleStationSelect = (station: MonitoringStation | null) => {
+  const handleStationSelect = useCallback((station: MonitoringStation | null) => {
     // Show loading state when selecting a new station
     if (station !== selectedStation) {
       setIsDetailsPanelLoading(true);
@@ -37,7 +36,7 @@ export default function Home() {
     } else {
       console.log('Station deselected');
     }
-  };
+  }, [selectedStation]);
 
   // Keyboard support for clearing selection
   useEffect(() => {
@@ -49,7 +48,7 @@ export default function Home() {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [selectedStation]);
+  }, [selectedStation, handleStationSelect]);
 
   return (
     <div className="min-h-screen">
@@ -123,7 +122,6 @@ export default function Home() {
                 className="w-full h-full rounded-2xl shadow-soft overflow-hidden" 
                 onStationSelect={handleStationSelect}
                 selectedStation={selectedStation}
-                onLoadingChange={setIsMapLoading}
               />
             </div>
           </motion.div>

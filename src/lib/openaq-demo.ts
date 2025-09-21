@@ -6,15 +6,11 @@
  */
 
 import { 
-  getNearbyStations, 
   getNearbyStationsWithMeasurements 
 } from './openaq-api';
 
 import { 
-  MonitoringStation, 
-  Coordinates, 
-  AirQualityMeasurement,
-  AQICategory 
+  MonitoringStation
 } from './types';
 
 import { generateMockStations } from './mockData';

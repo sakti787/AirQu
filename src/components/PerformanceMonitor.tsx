@@ -24,7 +24,17 @@ export const usePerformanceMetrics = () => {
         const totalLoadTime = navigation.loadEventEnd - navigation.fetchStart;
         
         // Memory usage (if available)
-        const memoryUsage = ((performance as any)?.memory as { usedJSHeapSize?: number })?.usedJSHeapSize || 0;
+        interface PerformanceMemory {
+          usedJSHeapSize?: number;
+          totalJSHeapSize?: number;
+          jsHeapSizeLimit?: number;
+        }
+        
+        const perfWithMemory = performance as Performance & {
+          memory?: PerformanceMemory;
+        };
+        
+        const memoryUsage = perfWithMemory?.memory?.usedJSHeapSize || 0;
         
         setMetrics({
           initialPageLoad,

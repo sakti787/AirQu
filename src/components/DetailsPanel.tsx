@@ -5,8 +5,7 @@ import { useEffect } from 'react';
 
 import { MonitoringStation } from '@/lib/types';
 import { DetailsPanelSkeleton } from './LoadingComponents';
-import { LazyAQIChartWrapper } from './LazyComponents';
-import { getAQIColor, getAQIColorScheme, getAQICategory, COMPONENT_STYLES } from '@/lib/design-system';
+import { getAQIColor, getAQIColorScheme } from '@/lib/design-system';
 
 interface DetailsPanelProps {
   selectedStation: MonitoringStation | null;

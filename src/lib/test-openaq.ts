@@ -51,7 +51,7 @@ export async function testOpenAQAPI() {
     try {
       await getAirQualityData(999, 999); // Invalid coordinates
       console.log('❌ Validation test failed - should have thrown error');
-    } catch (validationError) {
+    } catch {
       console.log('✅ Input validation working correctly');
     }
     

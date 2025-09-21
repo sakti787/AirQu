@@ -8,7 +8,6 @@ import { useEffect, useState } from 'react';
 import { getAirQualityData, MonitoringStation } from '@/lib/airQualityAPI';
 import { fixLeafletIcons } from '@/lib/leafletUtils';
 import { MapLoadingSpinner } from './LoadingComponents';
-import { AlertTriangle } from 'lucide-react';
 import { getAQIColor } from '@/lib/design-system';
 
 // Jakarta coordinates [latitude, longitude] - Monumen Nasional area
@@ -18,24 +17,6 @@ interface MapProps {
   className?: string;
   onStationSelect?: (station: MonitoringStation | null) => void;
   selectedStation?: MonitoringStation | null;
-  onLoadingChange?: (isLoading: boolean) => void;
-};
-
-// Function to get main pollutant
-const getMainPollutant = (station: MonitoringStation): string => {
-  if (!station.measurements || station.measurements.length === 0) {
-    return 'Data tidak tersedia';
-  }
-  
-  // Find the measurement with highest concentration relative to standard
-  const mainMeasurement = station.measurements.reduce((max, current) => {
-    // Prioritize PM2.5 and PM10 as they're most common AQI contributors
-    if (current.parameter === 'pm25') return current;
-    if (current.parameter === 'pm10' && max.parameter !== 'pm25') return current;
-    return max;
-  });
-  
-  return mainMeasurement.parameter.toUpperCase();
 };
 
 // Component to handle map click events
@@ -48,7 +29,7 @@ function MapClickHandler({ onStationSelect }: { onStationSelect?: (station: Moni
   return null;
 }
 
-export default function Map({ className = '', onStationSelect, selectedStation, onLoadingChange }: MapProps) {
+export default function Map({ className = '', onStationSelect, selectedStation }: MapProps) {
   const [stations, setStations] = useState<MonitoringStation[]>([]);
   const [loading, setLoading] = useState(true);
   const [usingMockData, setUsingMockData] = useState(false);
@@ -60,11 +41,6 @@ export default function Map({ className = '', onStationSelect, selectedStation, 
       fixLeafletIcons();
     }
   }, []);
-
-  // Notify parent component of loading state changes
-  useEffect(() => {
-    onLoadingChange?.(loading);
-  }, [loading, onLoadingChange]);
 
   // Fetch air quality data when component mounts
   useEffect(() => {

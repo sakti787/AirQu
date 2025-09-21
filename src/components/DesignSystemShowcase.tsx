@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { AQI_COLORS, getAQIColorScheme, COMPONENT_STYLES, DESIGN_TOKENS } from '@/lib/design-system';
+import { getAQIColorScheme, COMPONENT_STYLES } from '@/lib/design-system';
 
 export const DesignSystemShowcase: React.FC = () => {
   const aqiValues = [25, 75, 125, 175, 250, 350];

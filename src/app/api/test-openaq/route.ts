@@ -1,7 +1,7 @@
 // API endpoint to test OpenAQ connectivity
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Test the OpenAQ API directly
     const testUrl = 'https://api.openaq.org/v2/locations?limit=1&country=ID';

@@ -10,7 +10,7 @@ interface AQIChartProps {
 }
 
 // Generate mock historical data for the last 24 hours
-const generateHistoricalData = (currentAQI: number, stationName: string) => {
+const generateHistoricalData = (currentAQI: number) => {
   const data = [];
   const now = new Date();
   
@@ -48,7 +48,16 @@ const generateHistoricalData = (currentAQI: number, stationName: string) => {
 };
 
 // Custom tooltip component
-const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
+interface TooltipPayload {
+  payload: {
+    timeLabel: string;
+    aqi: number;
+    category: string;
+  };
+  value: number;
+}
+
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: TooltipPayload[] }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     const aqi = payload[0].value;
@@ -87,7 +96,7 @@ export default function AQIChart({ station }: AQIChartProps) {
     );
   }
 
-  const historicalData = generateHistoricalData(station.aqi, station.name);
+  const historicalData = generateHistoricalData(station.aqi);
   const currentAQI = station.aqi;
   const chartColor = getAQIColor(currentAQI);
 
